@@ -33,6 +33,8 @@ PC-B
 192.168.20.10/24
 ```
 
+![Topology in Cisco Packet Tracer](images/topology.png)
+
 ## IP Addressing
 
 | Device | Interface | IP Address         | Network           |
@@ -62,6 +64,8 @@ This tells R1:
 
 A return route is also required on R2 so that traffic can travel back to the `192.168.10.0/24` network.
 
+![show ip route output on R1/R2](images/show-ip-route.png)
+
 ## Testing
 
 Connectivity is tested by sending ICMP traffic between the two end hosts.
@@ -71,6 +75,8 @@ PC-A → R1 → R2 → PC-B
 ```
 
 The important concept is that PC-A and PC-B belong to different IP networks. Communication between them therefore requires the routers to make forwarding decisions based on their routing tables.
+
+![Successful ping from PC-A to PC-B](images/ping-pca-pcb.png)
 
 ## What I Learned
 
