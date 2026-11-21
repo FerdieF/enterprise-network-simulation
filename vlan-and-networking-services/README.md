@@ -35,6 +35,8 @@ The router provides the default gateway for each VLAN through subinterfaces.
            PCs        Server       PC
 ```
 
+![Topology in Cisco Packet Tracer](images/topology-vlan.png)
+
 ## VLANs & Subnetting
 
 Each VLAN is assigned its own IP subnet.
@@ -62,6 +64,8 @@ Gateway:        192.168.30.1
 
 Separating the VLANs provides logical separation between users, servers, and guest devices.
 
+![show vlan brief output](images/vlan-brief.png)
+
 ## Router-on-a-Stick
 
 A trunk link connects the switch to the router.
@@ -77,6 +81,8 @@ G0/0.30 → 192.168.30.1/24
 Each subinterface is associated with its corresponding VLAN using IEEE 802.1Q encapsulation.
 
 This allows the router to perform inter-VLAN routing.
+
+![show ip interface brief output](images/router-if-brief.png)
 
 ## DHCP
 
@@ -124,6 +130,8 @@ ping server.local
 
 also requires DNS resolution.
 
+![Successful ping to server.local](images/ping-server-local.png)
+
 ## Network Segmentation
 
 The Guest VLAN is separated from the Users and Servers VLANs using an ACL.
@@ -137,6 +145,30 @@ Guest → Servers VLAN        Denied
 ```
 
 This demonstrates how network segmentation can be combined with access control to restrict communication between different parts of a network.
+
+### Verification
+
+```text
+Router# show access-lists
+Extended IP access list 100
+    10 deny ip 192.168.30.0 0.0.0.255 192.168.20.0 0.0.0.255 (4 match(es))
+    20 deny ip 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255
+    30 permit ip any any (2 match(es))
+```
+
+The ACL is applied inbound (`ip access-group 100 in`) on the Guest subinterface (`G0/0.30`). Because it inspects everything entering the router from that interface, it blocks traffic in both directions of a Guest↔Server conversation — not just the request the Guest device initiates, but also any reply routed back through `G0/0.30`.
+
+![show access-lists with match counters](images/show-acl.png)
+
+| Test | Result |
+|---|---|
+| PC-D (Guest) → PC-C (Server) | ❌ Request timed out |
+| PC-C (Server) → PC-D (Guest) | ❌ Request timed out (reply blocked on the way back) |
+| PC-A (Users) → PC-C (Server) | ✅ Reply received |
+
+![PC-D to PC-C — denied](images/PC-D-to-C.png)
+![PC-C to PC-D — denied](images/PC-C-to-D.png)
+![PC-A to PC-C — permitted](images/PC-A-to-C.png)
 
 ## Troubleshooting
 
